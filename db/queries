@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS Vendors (id INTEGER PRIMATY KEY AUTOINCREMENT, name TEXT);
+
+CREATE TABLE IF NOT EXISTS Storers (id INTEGER PRIMATY KEY AUTOINCREMENT, name TEXT);
+
+CREATE TABLE IF NOT EXISTS Purchases (id INTEGER PRIMARY KEY AUTOINCREMENT,
+name TEXT,
+storer_id INTEGER,
+vendor_id INTEGER,
+FOREIGN KEY (storer_id) REFERENCES "Storers"("id"),
+FOREIGN KEY (vendor_id) REFERENCES "Vendors"("id"));
+
+... casual inserts
+
+#output
+SELECT Purchases.*, Storers.name AS StorerName, Vendors.name AS VendorsName, Clients.name AS ClientsName
+FROM Purchases
+LEFT JOIN Storers ON Purchases.storer_id = Storers.id
+LEFT JOIN Vendors ON Purchases.vendor_id = Vendors.id
+LEFT JOIN Clients ON Purchases.client_id = Clients.id;
+
+
