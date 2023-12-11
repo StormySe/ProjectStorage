@@ -20,6 +20,16 @@ var purchaseEntry = widget.NewEntry()
 var vendorEntry = widget.NewEntry()
 var clientEntry = widget.NewEntry()
 var storerEntry = widget.NewEntry()
+var purName = widget.NewEntry()
+var vendorName = widget.NewEntry()
+var clientName = widget.NewEntry()
+var storerName = widget.NewEntry()
+var dbname = widget.NewEntry()
+var searchPurchaseName = widget.NewEntry()
+var editPurName = widget.NewEntry()
+var editVendorName = widget.NewEntry()
+var editClientName = widget.NewEntry()
+var editStorerName = widget.NewEntry()
 
 var purchasesTable = widget.NewList(
   func() int {

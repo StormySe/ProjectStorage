@@ -1,18 +1,17 @@
 package db
 
 import (
-  "database/sql"
-  _ "github.com/mattn/go-sqlite3"
+	"database/sql"
 
-  "storage/models"
-  "storage/config"
-  "sync"
+	_ "github.com/mattn/go-sqlite3"
+
+	"storage/config"
+	"storage/models"
 )
 
 func Delete(purchase models.PucrhaseOut) {
   db, _ := sql.Open("sqlite3", config.AppConfig.DBName)
   defer db.Close()
-  var wg sync.WaitGroup
 
   var (
     vendors int
@@ -25,27 +24,16 @@ func Delete(purchase models.PucrhaseOut) {
   findClient, _ := db.Prepare(`SELECT count(client_id) FROM Purchases WHERE client_id = ?;`)
   findStorer, _ := db.Prepare(`SELECT count(storer_id) FROM Purchases WHERE storer_id = ?;`)
 
-  wg.Add(3)
+  
+  count := findVendor.QueryRow(purchase.VendorId)
+  count.Scan(&vendors)
 
-  go func(wg *sync.WaitGroup) {
-    count := findVendor.QueryRow(purchase.VendorId)
-    count.Scan(&vendors)
-    wg.Done()
-  }(&wg)
+  count = findStorer.QueryRow(purchase.StorerId)
+  count.Scan(&storers)
 
-  go func(wg *sync.WaitGroup) {
-    count := findStorer.QueryRow(purchase.StorerId)
-    count.Scan(&storers)
-    wg.Done()
-  }(&wg)
+  count = findClient.QueryRow(purchase.ClientId)
+  count.Scan(&clients)
 
-  go func(wg *sync.WaitGroup) {
-    count := findClient.QueryRow(purchase.ClientId)
-    count.Scan(&clients)
-    wg.Done()
-  }(&wg)
-
-  wg.Wait()
   if vendors <= 1 {
     db.Exec(`DELETE FROM Vendors WHERE id = ?;`, purchase.VendorId)
   }

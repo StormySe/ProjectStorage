@@ -50,13 +50,9 @@ func main() {
           purchase := db.Purchases[id]
           prevContent := createContent
 
-          purName := widget.NewEntry()
           purName.SetText(purchase.Name)
-          vendorName := widget.NewEntry()
           vendorName.SetText(purchase.VendorsName)
-          clientName := widget.NewEntry()
           clientName.SetText(purchase.ClientsName)
-          storerName := widget.NewEntry()
           storerName.SetText(purchase.StorersName)
 
           editForm := widget.NewForm(
@@ -170,7 +166,6 @@ func main() {
     widget.NewButtonWithIcon("", settingsIcon, func() {
       prevContent := createContent
       
-      dbname := widget.NewEntry()
       dbname.SetText(config.AppConfig.DBName)
       
       var demo bool
@@ -208,10 +203,11 @@ func main() {
     widget.NewButtonWithIcon("", searchIcon, func()  {
       previousContent := createContent
       searchItems := []models.PucrhaseOut{}
-      purchaseName := widget.NewEntry()
 
       backBtn := widget.NewButtonWithIcon("", backIcon, func() {
         purchasesTable.UnselectAll()
+        searchPurchaseName.SetText("")
+        searchPurchaseName.Refresh()
         createContent = previousContent
         w.SetContent(createContent)
       })
@@ -230,8 +226,8 @@ func main() {
       searchResults.OnSelected = func(id widget.ListItemID) {
         innerPreviousContent := createContent 
 
-        purName := widget.NewLabel(searchItems[id].Name)
-        purInfo := widget.NewLabel(
+        purNameLabel := widget.NewLabel(searchItems[id].Name)
+        purInfoLabel := widget.NewLabel(
           fmt.Sprintf(
             "Client: %s\nVendor: %s\nStorer: %s",
             searchItems[id].ClientsName,
@@ -239,7 +235,7 @@ func main() {
             searchItems[id].StorersName,
           ),
         )
-        info := container.NewVBox(purName, purInfo)
+        info := container.NewVBox(purNameLabel, purInfoLabel)
         back := widget.NewButtonWithIcon("", backIcon, func() {
           createContent = innerPreviousContent
           searchResults.UnselectAll()
@@ -250,39 +246,35 @@ func main() {
           purchase := db.Purchases[id]
           prevContent := createContent
 
-          purName := widget.NewEntry()
-          purName.SetText(purchase.Name)
-          vendorName := widget.NewEntry()
-          vendorName.SetText(purchase.VendorsName)
-          clientName := widget.NewEntry()
-          clientName.SetText(purchase.ClientsName)
-          storerName := widget.NewEntry()
-          storerName.SetText(purchase.StorersName)
+          editPurName.SetText(purchase.Name)
+          editVendorName.SetText(purchase.VendorsName)
+          editClientName.SetText(purchase.ClientsName)
+          editStorerName.SetText(purchase.StorersName)
 
           editForm := widget.NewForm(
-            widget.NewFormItem("Purchase Name:", purName),
-            widget.NewFormItem("Vendor Name:", vendorName),
-            widget.NewFormItem("Client Name:", clientName),
-            widget.NewFormItem("Storer Name:", storerName),
+            widget.NewFormItem("Purchase Name:", editPurName),
+            widget.NewFormItem("Vendor Name:", editVendorName),
+            widget.NewFormItem("Client Name:", editClientName),
+            widget.NewFormItem("Storer Name:", editStorerName),
             )
           editForm.OnCancel = func() {
-            purName.SetText("")
-            purName.Refresh()
-            vendorName.SetText("")
-            vendorName.Refresh()
-            clientName.SetText("")
-            clientName.Refresh()
-            storerName.SetText("")
-            storerName.Refresh()
+            editPurName.SetText("")
+            editPurName.Refresh()
+            editVendorName.SetText("")
+            editVendorName.Refresh()
+            editClientName.SetText("")
+            editClientName.Refresh()
+            editStorerName.SetText("")
+            editStorerName.Refresh()
             createContent = prevContent
             purchasesTable.UnselectAll()
             w.SetContent(createContent)
           }
           editForm.OnSubmit = func() {
-            db.Edit(&purchase, purName.Text, vendorName.Text, clientName.Text, storerName.Text)
-            searchItems[id] = purchase
+            db.Edit(&purchase, editPurName.Text, editVendorName.Text, editClientName.Text, editStorerName.Text)
             createContent = innerPreviousContent
             db.Get()
+            searchItems = db.Search(editClientName.Text)
             searchResults.UnselectAll()
             w.SetContent(createContent)
           }
@@ -321,10 +313,10 @@ func main() {
       }
 
       searchBtn := widget.NewButtonWithIcon("", searchIcon, func() {
-        searchItems = db.Search(purchaseName.Text)
+        searchItems = db.Search(searchPurchaseName.Text)
         searchResults.Refresh()
       })
-      bar := container.NewVBox(container.NewHBox(searchBtn, backBtn), purchaseName)
+      bar := container.NewVBox(container.NewHBox(searchBtn, backBtn), searchPurchaseName)
       createContent = container.NewBorder(bar, nil, nil, nil, searchResults)
 
       w.SetContent(createContent)
